@@ -22,11 +22,15 @@ import lombok.Data;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ResourceUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 /**
@@ -72,6 +76,7 @@ public class AccountController {
                 .put("avatar", user.getAvatar())
                 .put("email", user.getEmail())
                 .put("status", user.getStatus())
+                .put("create", user.getCreated())
                 .map()
         );
     }
@@ -114,7 +119,7 @@ public class AccountController {
         userRegina.setCreated(LocalDateTime.now());
         userRegina.setStatus(user.getStatus());
         userService.saveOrUpdate(userRegina);
-        System.out.println("注册成功！" + userRegina );
+        System.out.println("注册成功！" + userRegina);
         return Result.succ("注册成功！");
     }
 
@@ -179,4 +184,76 @@ public class AccountController {
         userService.removeById(userid);
         return Result.succ("删除成功", null);
     }
+
+    @RequiresAuthentication
+    @PostMapping("/avatar")
+    public Result avatar(@RequestParam(value = "file", required = false) MultipartFile file, LoginDto loginDto,User user) throws IOException {
+//        System.out.println(user);
+        System.out.println(file);
+        // 文件名
+        String fileName = file.getOriginalFilename();
+        // 在file文件夹中创建名为fileName的文件
+        assert fileName != null;
+        int split = fileName.lastIndexOf(".");
+        // 文件后缀，用于判断上传的文件是否是合法的
+        String suffix = fileName.substring(split+1,fileName.length());
+        //判断文件类型，因为我这边是图片，所以只设置三种合法格式
+        String url = "";
+        if (!file.isEmpty()) {
+//            User user1 = userService.getOne(new QueryWrapper<User>().eq("userName", loginDto.getUsername()));
+//            System.out.println(user1);
+//            System.out.println(file);
+//            User ua=null;
+            try {
+                File path = new File(ResourceUtils.getURL("classpath:").getPath());
+                File upload = new File(path.getAbsolutePath(), "upload/");
+                if(!upload.exists()) {
+                    upload.mkdirs();
+                }
+                String newName = System.currentTimeMillis() + "."+suffix;
+                String homepath = "/home/upload/images";
+                File savedFile = new File(upload + "/" + newName);
+                file.transferTo(savedFile);
+                url = savedFile.getAbsolutePath();
+//                user.getAvatar()
+                System.out.println("图片上传完毕，存储地址为："+ url);
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+
+//            String avatar =
+            return Result.succ("1",url);
+        }
+        return Result.fail("上传错误，请重试！");
+    }
+
+    @PostMapping("/userchange")
+   public Result userchange(@RequestBody User user){
+        return Result.succ("修改成功");
+   }
+   /**
+    * [com.example.entity.User]
+    * @author Tu
+    * @date 2021/3/24 14:45
+    * @message 修改名称 邮箱
+    * @return com.example.common.lang.Result
+    */
+   @PostMapping("/user/edit")
+    public  Result useredit(@RequestBody User user){
+        User uu=null;
+       uu =new User();
+       if(user.getAvatar()!= null && user.getEmail() != null){
+           uu.setAvatar(user.getAvatar());
+           uu.setEmail(user.getEmail());
+           return Result.succ("修改成功！");
+       }
+
+       System.out.println(user);
+       return Result.fail("修改失败！");
+   }
 }
+
+

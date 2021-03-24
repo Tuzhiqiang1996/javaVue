@@ -76,6 +76,12 @@ const routes = [
       import(/* webpackChunkName: "devList" */ "@/page/devList.vue")
   },
   {
+    path: "/userinfo",
+    name: "userinfo",
+    component: () =>
+      import(/* webpackChunkName: "userinfo" */ "@/page/userinfo.vue")
+  },
+  {
     path: "*",
     redirect: "/404"
   },
