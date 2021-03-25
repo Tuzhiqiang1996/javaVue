@@ -28,7 +28,7 @@
         </div>
         <div class="infobox">
           <p><i class="el-icon-date"></i>创建时间</p>
-          <p>{{ userInfo.create }}</p>
+          <p>{{ userInfo.created }}</p>
         </div>
       </el-card>
       <el-card class="box-card">
@@ -59,7 +59,9 @@
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="onSubmit('formInline')">保存</el-button>
+                  <el-button type="primary" @click="onSubmit('formInline')"
+                    >保存</el-button
+                  >
                 </el-form-item>
               </el-form>
             </div>
@@ -74,7 +76,11 @@
               class="demo-ruleForm"
             >
               <el-form-item label="旧密码" prop="oldpass">
-                <el-input  type="password" autocomplete="off" v-model="passwordForm.oldpass"></el-input>
+                <el-input
+                  type="password"
+                  autocomplete="off"
+                  v-model="passwordForm.oldpass"
+                ></el-input>
               </el-form-item>
               <el-form-item label="新密码" prop="pass">
                 <el-input
@@ -97,7 +103,8 @@
                   >提交</el-button
                 >
                 <el-button @click="resetpasswordForm('passwordForm')"
-                  >重置</el-button>
+                  >重置</el-button
+                >
               </el-form-item>
             </el-form>
           </el-tab-pane>
@@ -111,7 +118,7 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import Header from "./header";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 export default {
   name: "",
   //import引入的组件需要注入到对象中才能使用
@@ -197,27 +204,106 @@ export default {
   //监听属性 类似于data概念
   computed: { ...mapState(["userInfo"]) },
   //监控data中的数据变化
-  watch: {
-  },
+  watch: {},
   //方法集合
   methods: {
+    ...mapMutations({
+      SET_NAME: "SET_NAME",
+      SET_EMAIL: "SET_EMAIL",
+      SET_USERINFO: "SET_USERINFO",
+    }),
     handleClick(tab, event) {
       // console.log(tab, event);
     },
     //修改名称 邮箱
-    onSubmit() {
-      console.log(this.formInline)
+    onSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let url = "/user/edit";
+          let params = JSON.stringify(this.formInline);
+
+          this.$axios
+            .post(url, params, {
+              headers: {
+                Authorization: localStorage.getItem("token"),
+                "Content-Type": "application/json;charset=utf-8",
+              },
+            })
+            .then((res) => {
+              if (res.data.code == 200) {
+                // this.SET_USERINFO(res.data.data);
+                // this.SET_EMAIL(res.data.data);
+                this.SET_USERINFO(res.data.data);
+
+                this.$message({
+                  message: res.data.msg,
+                  center: true,
+                  type: "success",
+                });
+              } else {
+                this.$message({
+                  message: res.data.msg,
+                  center: true,
+                  type: "error",
+                });
+              }
+              console.log(res);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
     //修改密码
     submitpasswordForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            console.log(this.passwordForm)
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
+      console.log(this.passwordForm);
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let url = `/user/pass?id=${this.userInfo.id}&newpassword=${this.passwordForm.checkPass}&password=${this.passwordForm.oldpass}`;
+          // let params = JSON.stringify(this.passwordForm);
+          let params = {
+            id: this.userInfo.id,
+            password: this.passwordForm.oldpass,
+            newpassword: this.passwordForm.checkPass,
+          };
+          let data = JSON.stringify(params);
+          this.$axios
+            .post(url, {
+              headers: {
+                Authorization: localStorage.getItem("token"),
+                "Content-Type": "application/json;charset=utf-8",
+              },
+            })
+            .then((res) => {
+              if (res.data.code == 200) {
+                this.SET_USERINFO(res.data.data);
+
+                this.$message({
+                  message: res.data.msg,
+                  center: true,
+                  type: "success",
+                });
+              } else {
+                this.$message({
+                  message: res.data.msg,
+                  center: true,
+                  type: "error",
+                });
+              }
+              console.log(res);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
     resetpasswordForm(formName) {
       this.$refs[formName].resetFields();
@@ -227,11 +313,13 @@ export default {
   created() {
     this.formInline.username = this.userInfo.username;
     this.formInline.email = this.userInfo.email;
+    this.formInline.status = this.userInfo.status;
+    this.formInline.avatar = this.userInfo.avatar;
+    this.formInline.id = this.userInfo.id;
+    this.passwordForm.id = this.userInfo.id;
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {
-
-  },
+  mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
   beforeUpdate() {}, //生命周期 - 更新之前

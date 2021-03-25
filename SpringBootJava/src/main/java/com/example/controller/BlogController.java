@@ -69,7 +69,7 @@ public class BlogController {
         // System.out.println(blog.toString());
         //System.out.println("输入中...");
         Blog temp = null;
-        ;
+        System.out.println(blog);
         /**
          * @date 2021/2/21-11:37
          * 不知道声明错
@@ -94,7 +94,7 @@ public class BlogController {
 
 //        BeanUtil.copyProperties(blog, temp, "id", "userId", "created", "status");
         BeanUtil.copyProperties(blog, temp);
-        //        System.out.println(blog.getStatus() + "" + temp);
+//                System.out.println(blog + "****" + temp);
 
         blogService.saveOrUpdate(temp);
         return Result.succ("操作成功", null);

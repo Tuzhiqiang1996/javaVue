@@ -31,6 +31,7 @@
       <el-button @click="order"> 表格2 </el-button>
       <el-button @click="devlog"> 表格3 </el-button>
       <el-button @click="devlist"> 表格4 </el-button>
+      <el-button @click="updown"> 上传 </el-button>
     </div>
     <el-dialog
       title="修改头像"
@@ -148,6 +149,9 @@ export default {
     },
     userinfo() {
       this.$router.push('/userinfo')
+    },
+    updown() {
+      this.$router.push('/updown')
     },
     errorHandler() {
       return true;

@@ -32,4 +32,5 @@ public class DeviceListController {
 
         return Result.succ("操作成功！", pageData);
     }
+
 }

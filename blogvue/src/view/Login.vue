@@ -214,10 +214,10 @@ export default {
           this.$axios
             .post("/login", options)
             .then((res) => {
-              console.log(res);
+              // console.log(res);
               const { code } = res.data;
               if (code == 200) {
-                console.log(res);
+                // console.log(res);
                 const jwt = res.headers["authorization"];
                 const userInfo = res.data.data;
                 // // 把数据共享出去
@@ -228,6 +228,7 @@ export default {
                 this.$router.push({
                   path: "/home",
                 });
+
                 this.$message({
                   message: "登录成功！",
                   showClose: true,

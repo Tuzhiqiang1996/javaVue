@@ -22,7 +22,18 @@ mutations: {
         state.userInfo = {}
         localStorage.setItem("token", '')
         sessionStorage.setItem("userInfo", JSON.stringify(''))
-    }
+    },
+    SET_AVATAR:(state, avatar)=>{
+        state.userInfo.avatar=avatar
+    },
+    SET_NAME:(state, name)=>{
+
+        state.userInfo.username=name
+    },
+    SET_EMAIL:(state, email)=>{
+
+        state.userInfo.email=email
+    },
 
 },
 getters: {
