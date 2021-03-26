@@ -78,7 +78,7 @@ public class AccountController {
                 .put("avatar", user.getAvatar())
                 .put("email", user.getEmail())
                 .put("status", user.getStatus())
-                .put("create", user.getCreated())
+                .put("created", user.getCreated())
                 .map()
         );
     }
@@ -279,7 +279,7 @@ public class AccountController {
      * @message 修改密码
      * 获取前端特定的 参数 前端用get方式的形势拼接
      * 后端用   @RequestParam(name = "id") Integer id 接收
-     *
+     * <p>
      * http://localhost:8081/user/pass?id=1&newpassword="123"&password="123"
      * 将不需要的 敏感 数据进行  将json格式的字符串变成json对象
      * 再进行移除
